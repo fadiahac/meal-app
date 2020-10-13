@@ -11,6 +11,14 @@ import { Platform } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { createMaterialBottomTabNavigator } from 'react-navigation-material-bottom-tabs';
 
+const DefaultNavOptions = {
+    headerStyle: {
+        backgroundColor: Platform.OS === 'android' ? Colors.primaryColor : 'white',
+    },
+    headerTintColor: Platform.OS === 'android' ? 'white' : Colors.primaryColor,
+    headerTitle: 'A Screen',
+}
+
 const MealNavigator = createStackNavigator({
     Categories: {
         screen: CategoriesScreen,
@@ -26,18 +34,20 @@ const MealNavigator = createStackNavigator({
 }, {
     mode: 'modal',
     // initialRouteName: 'MealDetail',
-    defaultNavigationOptions: {
-        headerStyle: {
-            backgroundColor: Platform.OS === 'android' ? Colors.primaryColor : 'white',
-        },
-        headerTintColor: Platform.OS === 'android' ? 'white' : Colors.primaryColor,
-        headerTitle: 'A Screen',
-    }
+    defaultNavigationOptions: DefaultNavOptions
+});
+
+const FavNavigator = createStackNavigator({
+    Favorite: FavouritesScreen,
+    MealDetail: MealDetailScreen,
+}, {
+    defaultNavigationOptions: DefaultNavOptions,
 });
 
 const tabScreenConfig = {
     MEAL: {
-        screen: MealNavigator, navigationOptions: {
+        screen: MealNavigator,
+        navigationOptions: {
             tabBarLabel: 'MEALS!',
             tabBarIcon: (tabInfo) => {
                 return <MaterialIcons name="restaurant" size={25} color={tabInfo.tintColor} />
@@ -46,7 +56,8 @@ const tabScreenConfig = {
         }
     },
     FAVORITE: {
-        screen: FavouritesScreen, navigationOptions: {
+        screen: FavNavigator,
+        navigationOptions: {
             tabBarLabel: 'FAVORITES!',
             tabBarIcon: (tabInfo) => {
                 return <MaterialIcons name="favorite" size={25} color={tabInfo.tintColor} />
@@ -56,21 +67,19 @@ const tabScreenConfig = {
     }
 }
 
-const BottomFavTabNavigator = Platform.OS === 'android' 
-? createMaterialBottomTabNavigator(
-    tabScreenConfig, {
-        activeTintColor : 'white',
+const BottomFavTabNavigator = Platform.OS === 'android'
+    ? createMaterialBottomTabNavigator(
+        tabScreenConfig, {
+        activeTintColor: 'white',
         shifting: true, // tabBarColor works when it is set to true
         barStyle: {
             backgroundColor: Colors.primaryColor
         }
-        
-    }
-)
-: createBottomTabNavigator(tabScreenConfig, {
-    'tabBarOptions': {
-        'activeTintColor': Colors.accentColor,
-    }
-});
+    })
+    : createBottomTabNavigator(tabScreenConfig, {
+        'tabBarOptions': {
+            'activeTintColor': Colors.accentColor,
+        }
+    });
 
 export default createAppContainer(BottomFavTabNavigator);
