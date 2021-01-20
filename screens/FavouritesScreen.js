@@ -1,16 +1,44 @@
-import React from 'react';
+import React, { useEffect } from 'react';
+import { View, StyleSheet} from 'react-native';
+import {useSelector} from 'react-redux';
 import MealList from '../components/MealList';
-import { MEALS } from '../data/dummy-data';
+import {HeaderButtons, Item} from "react-navigation-header-buttons";
+import CustomHeaderButton from "../components/CustomHeaderButton";
+import DefaultText from '../components/DefaultText'
 
 const FavouritesScreen = props => {
+    const favMealData = useSelector(state => state.meals.favouriteMeals);
+    useEffect(() => {
+        props.navigation.setParams({totalFav:favMealData.length})
+    },[favMealData]);
+    if(favMealData.length === 0) {
+        return <View style={styles.emptyScree}>
+        <DefaultText>No favorite meal found. Please mark as favorite!!</DefaultText>
+    </View>
+    }
 
-    const favMealData = MEALS.filter(meals => meals.id == 'm1' || meals.id == 'm2');
+    return <MealList listData={favMealData} navigation={props.navigation}/>
+};
 
-    return <MealList listData={favMealData} navigation={props.navigation} />
-}
+FavouritesScreen.navigationOptions = (navData) => {
+    const totalFavMeals = navData.navigation.getParam('totalFav');
+    return {
+        headerTitle: `Your Favourites (${totalFavMeals})`,
+        headerLeft: () => (
+            <HeaderButtons HeaderButtonComponent={CustomHeaderButton}>
+                <Item title="Menu" iconName="menu" onPress={() => {
+                    navData.navigation.toggleDrawer()
+                }}/>
+            </HeaderButtons>
+        )
+    }
+};
 
-FavouritesScreen.navigationOptions = {
-    headerTitle: 'Your Favourites'
-}
-
+const styles = StyleSheet.create({
+    emptyScree: {
+        flex:1,
+        justifyContent: 'center',
+        alignItems: 'center',
+    }
+});
 export default FavouritesScreen;
